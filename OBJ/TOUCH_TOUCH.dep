@@ -1,5 +1,5 @@
 Dependencies for Project 'TOUCH', Target 'TOUCH': (DO NOT MODIFY !)
-F (.\main.c)(0x664B0CA5)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\USER -I..\HARDWARE\LED -I..\HARDWARE\LCD -I..\HARDWARE\KEY -I..\HARDWARE\IIC -I..\HARDWARE\24CXX -I..\FWLIB\inc -I..\HARDWARE\TOUCH -I..\HARDWARE\ADF4351 -I..\HARDWARE\PE4302-I E:\STM32_STUDY\PINPUYI\USER\RTE-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-I D:\Keil_v5\ARM\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Device\Include-D__UVISION_VERSION="517" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER --C99-o ..\obj\main.o --omf_browse ..\obj\main.crf --depend ..\obj\main.d)
+F (.\main.c)(0x664B62BE)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\USER -I..\HARDWARE\LED -I..\HARDWARE\LCD -I..\HARDWARE\KEY -I..\HARDWARE\IIC -I..\HARDWARE\24CXX -I..\FWLIB\inc -I..\HARDWARE\TOUCH -I..\HARDWARE\ADF4351 -I..\HARDWARE\PE4302-I E:\STM32_STUDY\PINPUYI\USER\RTE-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-I D:\Keil_v5\ARM\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Device\Include-D__UVISION_VERSION="517" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER --C99-o ..\obj\main.o --omf_browse ..\obj\main.crf --depend ..\obj\main.d)
 I (..\SYSTEM\sys\sys.h)(0x66458AC7)
 I (..\USER\stm32f4xx.h)(0x5821A2CC)
 I (..\CORE\core_cm4.h)(0x5821A2CB)
@@ -48,6 +48,8 @@ I (..\HARDWARE\TOUCH\gt9147.h)(0x5821A2CC)
 I (..\HARDWARE\TOUCH\ft5206.h)(0x5821A2CC)
 I (..\HARDWARE\ADF4351\ADF4351.h)(0x664B0BA0)
 I (..\HARDWARE\PE4302\PE4302.h)(0x5A068621)
+I (control.h)(0x664B13BD)
+I (D:\Keil_v5\ARM\ARMCC\include\math.h)(0x55DB2B7E)
 F (.\stm32f4xx_it.c)(0x5821A2CC)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\USER -I..\HARDWARE\LED -I..\HARDWARE\LCD -I..\HARDWARE\KEY -I..\HARDWARE\IIC -I..\HARDWARE\24CXX -I..\FWLIB\inc -I..\HARDWARE\TOUCH -I..\HARDWARE\ADF4351 -I..\HARDWARE\PE4302-I E:\STM32_STUDY\PINPUYI\USER\RTE-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-I D:\Keil_v5\ARM\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Device\Include-D__UVISION_VERSION="517" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER --C99-o ..\obj\stm32f4xx_it.o --omf_browse ..\obj\stm32f4xx_it.crf --depend ..\obj\stm32f4xx_it.d)
 I (stm32f4xx_it.h)(0x5821A2CC)
 I (stm32f4xx.h)(0x5821A2CC)
@@ -158,7 +160,7 @@ I (..\FWLIB\inc\stm32f4xx_can.h)(0x5821A2CB)
 I (..\FWLIB\inc\stm32f4xx_dac.h)(0x5821A2CB)
 I (..\FWLIB\inc\stm32f4xx_dcmi.h)(0x5821A2CB)
 I (..\FWLIB\inc\stm32f4xx_fsmc.h)(0x5821A2CB)
-F (..\HARDWARE\LCD\lcd.c)(0x6481A6BB)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\USER -I..\HARDWARE\LED -I..\HARDWARE\LCD -I..\HARDWARE\KEY -I..\HARDWARE\IIC -I..\HARDWARE\24CXX -I..\FWLIB\inc -I..\HARDWARE\TOUCH -I..\HARDWARE\ADF4351 -I..\HARDWARE\PE4302-I E:\STM32_STUDY\PINPUYI\USER\RTE-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-I D:\Keil_v5\ARM\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Device\Include-D__UVISION_VERSION="517" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER --C99-o ..\obj\lcd.o --omf_browse ..\obj\lcd.crf --depend ..\obj\lcd.d)
+F (..\HARDWARE\LCD\lcd.c)(0x664B0D4C)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\USER -I..\HARDWARE\LED -I..\HARDWARE\LCD -I..\HARDWARE\KEY -I..\HARDWARE\IIC -I..\HARDWARE\24CXX -I..\FWLIB\inc -I..\HARDWARE\TOUCH -I..\HARDWARE\ADF4351 -I..\HARDWARE\PE4302-I E:\STM32_STUDY\PINPUYI\USER\RTE-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-I D:\Keil_v5\ARM\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Device\Include-D__UVISION_VERSION="517" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER --C99-o ..\obj\lcd.o --omf_browse ..\obj\lcd.crf --depend ..\obj\lcd.d)
 I (..\HARDWARE\LCD\lcd.h)(0x6481A49B)
 I (..\SYSTEM\sys\sys.h)(0x66458AC7)
 I (..\USER\stm32f4xx.h)(0x5821A2CC)

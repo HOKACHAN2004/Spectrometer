@@ -2398,7 +2398,7 @@ void LCD_Init(void)
 		
 		LCD_SSD_BackLightSet(100);//背光设置为最亮
 	}		 
-	LCD_Display_Dir(0);		//默认为竖屏
+	LCD_Display_Dir(1);		//默认为竖屏0 改为横屏1
 	LCD_LED=1;				//点亮背光
 	LCD_Clear(WHITE);
 }  

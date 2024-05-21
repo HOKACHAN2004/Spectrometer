@@ -48,3 +48,5 @@
 ..\obj\main.o: ..\HARDWARE\TOUCH\ft5206.h
 ..\obj\main.o: ..\HARDWARE\ADF4351\ADF4351.h
 ..\obj\main.o: ..\HARDWARE\PE4302\PE4302.h
+..\obj\main.o: control.h
+..\obj\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

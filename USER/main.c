@@ -7,6 +7,9 @@
 #include "touch.h" 
 #include "ADF4351.h"
 #include "PE4302.h"
+#include "control.h"
+#include "math.h"
+
 
 //ALIENTEK 探索者STM32F407开发板 实验28
 //触摸屏实验   --库函数版本
@@ -21,7 +24,7 @@ void Load_Drow_Dialog(void)
 	LCD_Clear(WHITE);//清屏   
  	POINT_COLOR=BLUE;//设置字体为蓝色 
 	LCD_ShowString(lcddev.width-24,0,200,16,16,"RST");//显示清屏区域
-  	POINT_COLOR=RED;//设置画笔蓝色 
+  POINT_COLOR=RED;//设置画笔红色
 }
 ////////////////////////////////////////////////////////////////////////////////
 //电容触摸屏专有部分
@@ -118,7 +121,7 @@ void rtp_test(void)
 	u8 i=0;	  
 	while(1)
 	{
-	 	key=KEY_Scan(0);
+	 	key=KEY_Scan(1);
 		tp_dev.scan(0); 		 
 		if(tp_dev.sta&TP_PRES_DOWN)			//触摸屏被按下
 		{	
@@ -174,7 +177,9 @@ void ctp_test(void)
 		if(i%20==0)LED0=!LED0;
 	}	
 }
-	
+/*函数声明*/
+void display_main_menu();
+void wait_for_press(int stage);
 int main(void)
 { 
 
@@ -184,21 +189,127 @@ int main(void)
 	
 	LED_Init();					//初始化LED 
  	LCD_Init();					//LCD初始化 
+	lcddev.dir = 1;
 	KEY_Init(); 				//按键初始化  
 	tp_dev.init();				//触摸屏初始化
-  ADF4351Init();        // 初始化ADF4351
+	
+  	ADF4351Init();        // 初始化ADF4351
 	ADF4351WriteFreq(400);
 	PE_GPIO_Init();   // 初始化PE4302
 	PE4302_0_Set(60);
  	POINT_COLOR=RED;//设置字体为红色 
-	LCD_ShowString(30,50,200,16,16,"Explorer STM32F4");	
-	LCD_ShowString(30,70,200,16,16,"TOUCH TEST");	
-	LCD_ShowString(30,90,200,16,16,"ATOM@ALIENTEK");
-	LCD_ShowString(30,110,200,16,16,"2014/5/7");
-   	if(tp_dev.touchtype!=0XFF)LCD_ShowString(30,130,200,16,16,"Press KEY0 to Adjust");//电阻屏才显示
-	delay_ms(1500);
- 	Load_Drow_Dialog();	 	
-	
+ 	
+	/*
 	if(tp_dev.touchtype&0X80)ctp_test();//电容屏测试
 	else rtp_test(); 					//电阻屏测试
+	*/
+	
+	/* 按键校准 */
+	
+	LCD_Clear(WHITE);	//清屏
+	//TP_Adjust();  		//屏幕校准 
+	//TP_Save_Adjdata();	 
+	//Load_Drow_Dialog(); // 刷白屏并显示RST
+	
+	
+	display_main_menu();
+	machine_state = IDLE;
+
+	while(1){
+		// 首先等待触摸
+		
+		delay_ms(100);
+	}
+
+	
+}
+/*
+	打印初级菜单
+*/
+void display_main_menu()
+{
+	POINT_COLOR=RED;//设置字体为红色 
+	LCD_ShowString(100,50,100,16,16,"Wave Output(1)");
+	LCD_DrawRectangle(80,40,200,80);
+	
+	LCD_ShowString(100,100,100,16,16,"Scan Mode(2)");
+	LCD_DrawRectangle(80,90,200,130);
+	
+	LCD_ShowString(100,150,100,16,16,"AM(3)");
+	LCD_DrawRectangle(80,140,200,180);
+	return;
+}
+
+// stage = 0: 表示在初始菜单等待 
+// stage = 1；表示在数字输入菜单等待
+#define BOUND(x1,x2,y1,y2) (tp_dev.x[0] >= (x1) && tp_dev.x[0] <= (x2) && tp_dev.y[0] >= (y1) && tp_dev.y[0] <= (y2))
+
+void wait_for_press(int stage)
+{
+	
+	
+	u8 key;
+	while(1){
+	 	key=KEY_Scan(0);
+		tp_dev.scan(0); 		
+		if(tp_dev.sta&TP_PRES_DOWN)			//触摸屏被按下
+		{	
+			if(stage==0)
+			{
+				// 在初始菜单等待
+				if(tp_dev.x[0] >= 80 && tp_dev.x[0] <= 200 && tp_dev.y[0] >= 40 && tp_dev.y[0] <= 80)
+				{
+					// Scan 10KHZ
+					cur_state = MODE10K;
+					printf("%d,%d\n",tp_dev.x[0],tp_dev.y[0]);
+					LED0 = !LED0;
+					return;
+				}
+				else if (BOUND(80,200,90,130))
+				{
+					cur_state = MODE100K;
+					printf("100K\n");
+					LED0 = !LED0;
+					return;
+				}else if (BOUND(80,200,140,180))
+				{
+					cur_state = AMMODE;
+					printf("AM\n");
+					printf("%d,%d\n",tp_dev.x[0],tp_dev.y[0]);
+					LED0 = !LED0;
+					return;
+				}
+			}
+		}else delay_ms(10);	//没有按键按下的时候
+		
+	}
+}
+
+
+
+
+/*计算衰减值*/
+#define VALUE (a*16.0f+b*8.0f+c*4.0f+d*2.0f+e*1.0f+f*0.5f)
+float cal_decay_value(float Vpp)
+{
+	const float jizhun = -13.1;
+	float delta = jizhun - 10 - 20 * log10(0.5*Vpp); // 要衰减的值
+	float delta_min = 1000.0f;
+	float final_setvalue = 0.0f;
+	// 16 8 4 2 1 0.5
+	for (int a = 0; a < 2; a++)
+		for (int b = 0; b < 2; b++)
+			for (int c = 0; c < 2; c++)
+				for (int d = 0; d < 2; d++)
+					for (int e = 0; e < 2; e++)
+						for (int f = 0; f < 2; f++)
+						{
+							if (fabs(VALUE-delta) < delta_min)
+							{
+								delta_min = fabs(VALUE - delta);
+								final_setvalue = VALUE;
+							}
+						}
+						//printf("delta:%f",delta);
+	return final_setvalue;
 }

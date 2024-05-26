@@ -25,8 +25,6 @@
 //V4.2 20211222
 //1，修改FSMC速度，兼容7789显示OV2640数据
 //2，解决因NT5510 ID读取（发送C501指令）导致SSD1963误触发软件复位进而读取不到ID问题，加延时解决
-//V4.3 20230607
-//新增对ST7796和ILI9806 IC支持
 //////////////////////////////////////////////////////////////////////////////////	 
 
 //LCD重要参数集
@@ -104,6 +102,12 @@ typedef struct
 
 #define LGRAYBLUE        0XA651 //浅灰蓝色(中间层颜色)
 #define LBBLUE           0X2B12 //浅棕蓝色(选择条目的反色)
+
+//坐标原点宏定义
+#define ORIGIN_X0 10
+#define ORIGIN_Y0 200
+#define AXIS_X_W 200
+#define AXIS_Y_H 200
 	    															  
 void LCD_Init(void);													   	//初始化
 void LCD_DisplayOn(void);													//开显示
@@ -121,7 +125,16 @@ void LCD_Color_Fill(u16 sx,u16 sy,u16 ex,u16 ey,u16 *color);				//填充指定颜色
 void LCD_ShowChar(u16 x,u16 y,u8 num,u8 size,u8 mode);						//显示一个字符
 void LCD_ShowNum(u16 x,u16 y,u32 num,u8 len,u8 size);  						//显示一个数字
 void LCD_ShowxNum(u16 x,u16 y,u32 num,u8 len,u8 size,u8 mode);				//显示 数字
+void LCD_ShowFloat(u16 x,u16 y,double num,u8 precision,u8 len,u8 size);
+void LCD_ShowxFloat(u16 x,u16 y,double num,u8 precision,u8 len,u8 size,u8 mode);
 void LCD_ShowString(u16 x,u16 y,u16 width,u16 height,u8 size,u8 *p);		//显示一个字符串,12/16字体
+void LCD_ShowxString(u16 x,u16 y,u16 width,u16 height,u8 size,u8 *p,u8 mode);
+
+void LCD_DrawAxis(u16 x1,u16 y1,u16 x2,u16 y2);
+void LCD_ShowData(double* data,u16 dataLength,u16 step,u16 start_freq,u16 end_freq);
+void LCD_DataSweep(u16 DataNum,u16 Seq,float Amp);
+void LCD_FreqNote(u16 DataNum,u16 Dist,u16 StartFreq,u16 EndFreq);
+void LCD_ShowMsg();
 
 void LCD_WriteReg(u16 LCD_Reg, u16 LCD_RegValue);
 u16 LCD_ReadReg(u16 LCD_Reg);
@@ -132,8 +145,8 @@ void LCD_Scan_Dir(u8 dir);									//设置屏扫描方向
 void LCD_Display_Dir(u8 dir);								//设置屏幕显示方向
 void LCD_Set_Window(u16 sx,u16 sy,u16 width,u16 height);	//设置窗口					   						   																			 
 //LCD分辨率设置
-#define SSD_HOR_RESOLUTION		800		//LCD水平分辨率
-#define SSD_VER_RESOLUTION		480		//LCD垂直分辨率
+#define SSD_HOR_RESOLUTION		320		//LCD水平分辨率
+#define SSD_VER_RESOLUTION		240		//LCD垂直分辨率
 //LCD驱动参数设置
 #define SSD_HOR_PULSE_WIDTH		1		//水平脉宽
 #define SSD_HOR_BACK_PORCH		46		//水平前廊

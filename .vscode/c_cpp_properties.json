@@ -7,7 +7,7 @@
                 "${workspaceFolder}/HARDWARE/**",
                 "${workspaceFolder}/SYSTEM/**",
                 "${workspaceFolder}/USER/**",
-                "${workspaceFolder}/FWLIB/**",
+                "${workspaceFolder}/FWLIB/inc/**",
                 "${workspaceFolder}/CORE/**"
             ],
             "defines": [

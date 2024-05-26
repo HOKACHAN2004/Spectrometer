@@ -1,5 +1,5 @@
-..\obj\pe4302.o: ..\HARDWARE\PE4302\PE4302.c
-..\obj\pe4302.o: ..\HARDWARE\PE4302\PE4302.h
+..\obj\pe4302.o: ..\HARDWARE\PE4302\PE4302.C
+..\obj\pe4302.o: ..\HARDWARE\PE4302\PE4302.H
 ..\obj\pe4302.o: ..\SYSTEM\sys\sys.h
 ..\obj\pe4302.o: ..\USER\stm32f4xx.h
 ..\obj\pe4302.o: ..\CORE\core_cm4.h

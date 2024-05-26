@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "keyboard.h": "c",
+        "adf4351.h": "c",
+        "pe4302.h": "c",
+        "led.h": "c",
+        "lcd.h": "c",
+        "key.h": "c",
+        "stdlib.h": "c",
+        "adc.h": "c",
+        "array": "c",
+        "stm32f4xx_rng.h": "c",
+        "rng.h": "c",
+        "sys.h": "c"
+    }
+}

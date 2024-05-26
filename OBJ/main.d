@@ -42,11 +42,10 @@
 ..\obj\main.o: ..\HARDWARE\LCD\lcd.h
 ..\obj\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\obj\main.o: ..\HARDWARE\KEY\key.h
-..\obj\main.o: ..\HARDWARE\TOUCH\touch.h
-..\obj\main.o: ..\HARDWARE\TOUCH\ott2001a.h
-..\obj\main.o: ..\HARDWARE\TOUCH\gt9147.h
-..\obj\main.o: ..\HARDWARE\TOUCH\ft5206.h
 ..\obj\main.o: ..\HARDWARE\ADF4351\ADF4351.h
 ..\obj\main.o: ..\HARDWARE\PE4302\PE4302.h
 ..\obj\main.o: control.h
 ..\obj\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\main.o: ..\HARDWARE\KEYBOARD\KeyBoard.h
+..\obj\main.o: ..\HARDWARE\ADC\adc.h
+..\obj\main.o: rng.h

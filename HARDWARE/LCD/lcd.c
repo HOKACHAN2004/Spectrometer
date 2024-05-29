@@ -2512,12 +2512,22 @@ void LCD_ShowxString(u16 x,u16 y,u16 width,u16 height,u8 size,u8 *p,u8 mode)
 }
 
 //画出x-y坐标轴
+#define LOWEST_Y -120
 void LCD_DrawAxis(u16 x1,u16 y1,u16 x2,u16 y2)
 {
 	LCD_DrawLine(x1, y1, x2, y1);
-	LCD_ShowString(x2-20,y1+10,120,24,16,"Freq/MHz");
+	LCD_ShowString(x2-20,215,120,20,12,"Freq/MHz");
     LCD_DrawLine(x1, y1, x1, y2);
 	LCD_ShowString(0,0,120,24,16,"Amp/dBm");
+	// 画y轴刻度
+	char temp_str[20] = {0};
+	for (int i = 0;i < 5; i++)
+	{
+		sprintf(temp_str, "%d", LOWEST_Y + i * 20);
+		float delta_y = (LOWEST_Y + i *20 + 120) * 200 / (120 - 25);
+		LCD_ShowString(ORIGIN_X0+5, ORIGIN_Y0 - delta_y, 20,10, 12,temp_str);
+	}
+
 }
 
 //以离散形式在x-y坐标系中显示data数组里的数据

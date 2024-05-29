@@ -21,15 +21,16 @@ float data[LEN]; // 保存采样的数据
 float data_polyed_v[LEN]; // 拟合为V的数据
 float data_polyed_dbm[LEN]; // 拟合为dbm的数据
 u8 spectrum_mode=0; // 屏幕测量的模式，默认为0 (100kHz), 1(10K)
-
+float start_freq = 0; // 测量频谱时的起始频率
+int freq_step = 100; // 步长
 /*打印初级菜单*/
 void display_main_menu()
 {
 	POINT_COLOR = RED; // 设置字体为红色
 	LCD_ShowString(100, 50, 200, 16, 16, "Single Output(1)");
 	LCD_ShowString(100, 100, 200, 16, 16, "Continuous Output(2)");
-	LCD_ShowString(100, 150, 200, 16, 16, "Spectrum Analyzer(100K)");
-	LCD_ShowString(100, 200, 200, 16, 16, "Spectrum Analyzer(10K)");
+	LCD_ShowString(100, 150, 200, 16, 16, "Spectrum Analyzer(3)");
+	LCD_ShowString(100, 200, 200, 16, 16, "Spectrum Analyzer(AM)(4)");
 	return;
 }
 
@@ -39,7 +40,7 @@ void display_main_menu()
 #define INPUT_VALUE (a * 32 + b * 16 + c * 8 + d * 4 + e * 2 + f * 1)
 float cal_decay_value(float Vpp)
 {
-	const float jizhun = -12.4;
+	const float jizhun = -1.8;
 	float delta = jizhun - 10 - 20 * log10(0.5 * Vpp); // 要衰减的db值
 	float delta_min = 1000.0f;
 	unsigned char final_setvalue = 0;
@@ -73,10 +74,11 @@ float cal_decay_value(float Vpp)
 #define TAG_X 200
 #define TAG_Y 20
 
+
 int pos1; // 最大值位置
 int pos2; // 第二大值位置
 int pos3; // 第三大值位置
-int scatter_pos[20]; // 杂散点位置分布
+int scatter_pos[201]; // 杂散点位置分布
 int scatter_num;
 float MA; // 调幅指数
 
@@ -116,27 +118,32 @@ void find_top_three(float * array, int len)
 /* 寻找杂散值 */
 void find_scatter()
 {
-	// 定义幅值大于2% Vpp的为杂散点
+	// 定义幅值大于2% Vm的为杂散点
 	scatter_num = 0;
-	float threshold = data[pos1] * 0.02;
+	float threshold = data_polyed_v[pos1] * 0.02f;
+
 	for (int i = 0; i < LEN; i++)
 	{
-		if (data[i] > threshold && i != pos1 && i != pos2 && i != pos3)
+		if (data_polyed_v[i] > threshold && i != pos1 && i != pos2 && i != pos3)
 			scatter_pos[scatter_num++] = i;
 	}
 }
 /* 数据拟合到电压值 */
+// 由dbm到幅值
 float poly_v(float origin)
 {
-	return 0.0255f * origin + 2.5323f;
+	float res = 2 * pow(10,((origin-10.0f)/20.0f));
+	return res;
 }
 
 /* 数据拟合到dbm*/
+// 由测量的直流电平换算成dbm
 float poly_dbm(float origin)
 {
 	
-	// 随机测试
-	return RNG_Get_RandomRange(-70,-25);
+	float res = 39.75f * origin - 124.8f + BIAS;
+	//return RNG_Get_RandomRange(-60,-30);
+	return res;
 }
 void single_output_handler()
 {
@@ -184,8 +191,6 @@ void single_output_handler()
 
 		if (stage_num == 2)
 		{
-			// printf("Start Output here\n");
-			// ADF4351WriteFreq(preset_freq);
 			//  输入幅度
 			Vpp = input_double(80, 200);
 			LCD_ShowString(200, 200, 300, 50, STATE_FONTSIZE, "mVpp");
@@ -214,16 +219,22 @@ void single_output_handler()
 			ADF4351WriteFreq(preset_freq);
 			unsigned char decay_db = cal_decay_value(0.001 * Vpp);
 			delay_ms(100);
-			PE4302_Set(0);
+			PE4302_Set(decay_db);
 			printf("Frequency: %lf, mVpp:%lf,decay_db: %u\n", preset_freq, Vpp, decay_db);
 		}
 		else if (key_value == 4)
 		{
 			// KEY UP 按下 返回
+			
 			machine_state = IDLE;
 			LCD_Clear(WHITE);
 			display_main_menu();
 			return;
+			
+			// debug here
+			//float adcx = Get_Adc_Average(ADC_Channel_4, 20); // ADC1 通道4 20次取平均
+			//float data_converted = adcx * 3.3f / 4096; // 12位ADC采集的原始数据
+			//printf("%lf\n",data_converted);
 		}
 	}
 }
@@ -259,7 +270,7 @@ void continuous_output_handler()
 			Vpp = input_double(80, 100);
 			LCD_ShowString(200, 100, 300, 50, STATE_FONTSIZE, "mVpp");
 			if (Vpp > 9 && Vpp < 101)
-			{ // 如果预置频率合法
+			{ // 如果预置幅值合法
 				printf("Valid Vpp\n");
 				stage_num = 2;
 			}
@@ -303,11 +314,13 @@ void continuous_output_handler()
 			float delta_time = scan_time / 200.0f;
 			printf("Start continuous output.\n");
 			printf("Scan time:%f\n",scan_time);
+			unsigned char decay_value = cal_decay_value(0.001*Vpp);
+			PE4302_Set(decay_value);
 			for(int i = 0; i <= 200; i++)
 			{
 				// 循环输出
 				float cur_freq = 90 + i * 0.1;
-				printf("Cur_frequency:%f\n",cur_freq);
+				if (i % 20 == 0) printf("Cur_frequency:%f\n",cur_freq);
 				ADF4351WriteFreq(cur_freq);
 				delay_ms(delta_time * 1000);
 				
@@ -326,83 +339,114 @@ void continuous_output_handler()
 }
 /**
  * 扫频输出并绘制图像
- * @param freq1_: 起始频率
- * @param freq2_: 终止频率
- * @param mode: 0表示100K步长，1表示10K步长
+ * @param mode: 0表示一般频谱测量 1表示AM波的MA指数测量模式
 */
-void spectrum_drawing(float freq1_, float freq2_, u8 mode)
+
+void spectrum_drawing(u8 mode)
 {
-	float delta = mode?0.01:0.1;
-	float cur_freq = freq1_;
+	float delta = freq_step*0.001;
+	float cur_freq = start_freq + 10.7f; // 要差一个中频
 	int i;
-	char temp_str[10] = {0};
+	char temp_str[20] = {0};
+	int delta_y = 0;
 	// 清屏并绘图
 	LCD_Clear(WHITE);
 	POINT_COLOR = BLACK;
 	LCD_DrawAxis(ORIGIN_X0,ORIGIN_Y0,ORIGIN_X0+AXIS_X_W,ORIGIN_Y0-AXIS_Y_H);
-	if (mode)
+	PE4302_Set(0); // 不衰减
+	if (freq_step==10)
 		LCD_ShowString(210,10,100,50,NOTE_FONTSIZE, "Step: 10K");
 	else 
 		LCD_ShowString(210,10,100,50,NOTE_FONTSIZE, "Step: 100K");
+	
 	for (i = 0; i<201; i++)
 	{
-		cur_freq = freq1_ + i * delta;
+		cur_freq = start_freq + 10.7f + i * delta;
 		ADF4351WriteFreq(cur_freq);
 		delay_ms(40);
-
-		float adcx = Get_Adc_Average(ADC_Channel_4, 10); // ADC1 通道4 10次取平均
-		
-		data[i] = adcx * 3.3f / 4096; // 12位ADC
-		data_polyed_v[i] = poly_v(data[i]); // 数据拟合为V
-		data_polyed_dbm[i] = poly_dbm(data_polyed_v[i]); // 数据拟合到dbm
-
+		float adcx = Get_Adc_Average(ADC_Channel_4, 20); // ADC1 通道4 20次取平均
+		data[i] = adcx * 3.3f / 4096; // 12位ADC采集的原始数据
+		data_polyed_dbm[i] = poly_dbm(data[i]); // 数据拟合到dbm
+		printf("adcx: %.4f, dbm:%.2f, at %.2f\n",data[i],data_polyed_dbm[i],cur_freq);
+		data_polyed_v[i] = poly_v(data_polyed_dbm[i]); // 数据拟合为V（幅值）
 		// 绘图
-		int delta_y = (data_polyed_dbm[i] + 70) * 200 / (70 - 25); // 假设最低位置是-70dbm 最高是-25dbm
+		delta_y = (data_polyed_dbm[i] + LOWEST) * 200 / (LOWEST - HIGHEST);
+		
 		LCD_DrawLine(ORIGIN_X0+i,ORIGIN_Y0,ORIGIN_X0+i, ORIGIN_Y0-delta_y);
 
 		// 屏幕上显示当前输出的freq值
 		sprintf((char*)temp_str,"ADF: %.2f",cur_freq);
-		LCD_ShowString(210,50,100,50,NOTE_FONTSIZE,temp_str);
+		LCD_ShowString(210,30,100,50,NOTE_FONTSIZE,temp_str);
+
+		// 每隔40个点显示横坐标
+		if (i % 40 == 0)
+		{
+			printf("Run in axis\n");
+			sprintf((char*)temp_str,"%.2f",cur_freq-10.7f);
+			LCD_ShowString(ORIGIN_X0+i, ORIGIN_Y0+2,100,15,12,temp_str);
+		}
+
 	}
 
 	// 扫描结束
 	
-	/*
+	
 	//下面进行数据处理操作 
 	// 1. 判断是单频输出还是AM波
 	// 2. 若为单频输出，找到峰值，高亮显示，显示对应的频率和幅度dbm
 	// 3. 若为AM波，找到三个峰值，高亮显示，计算调幅指数
 
-	find_top_three(&data[0], LEN); // 寻找三个峰值
-	find_scatter(); // 寻找杂散点
-	u8 wave_form = 0; // 1代表AM波 0代表单频波
-	// 判断输入波形类型
-	if (data[pos2] >= 0.3 * data[pos1] || data[pos3] >= 0.3 * data[pos1])
-	{
-		wave_form = 1;
-		MA = (data_polyed_v[pos2] + data_polyed_v[pos3]) / data_polyed_v[pos1];
-		// 高亮显示三个位置
-		
-	}else 
-	{
-		wave_form = 0;
-		// 高亮显示最高的位置
-	}
-   */
-	 
-	
-	return;
-	
-	
+	find_top_three(&data[0], 211); // 寻找三个峰值
+	//find_scatter(); // 寻找杂散点
+	float max_freq = 0;
 
+		// AM波 只适用于100K步长的情况
+		// 若最大值出现在最左侧 
+		MA = (data_polyed_v[pos1-1] + data_polyed_v[pos1+1]) / data_polyed_v[pos1];
+		
+		// 高亮显示三个位置
+		POINT_COLOR = RED;
+		delta_y = (data_polyed_dbm[pos1] + 105) * 200 / (105 - 25); 
+		LCD_DrawLine(ORIGIN_X0+pos1,ORIGIN_Y0-delta_y,ORIGIN_X0+pos1, ORIGIN_Y0);
+		delta_y = (data_polyed_dbm[pos2] + 105) * 200 / (105 - 25); 
+		LCD_DrawLine(ORIGIN_X0+pos2,ORIGIN_Y0-delta_y,ORIGIN_X0+pos2, ORIGIN_Y0);
+		delta_y = (data_polyed_dbm[pos3] + 105) * 200 / (105 - 25); 
+		LCD_DrawLine(ORIGIN_X0+pos3,ORIGIN_Y0-delta_y,ORIGIN_X0+pos3, ORIGIN_Y0);
+		// 屏幕显示类型
+		POINT_COLOR = BLACK;
+		if (mode) LCD_ShowString(220,50,100,50,NOTE_FONTSIZE,"AM-WAVE");
+		else LCD_ShowString(210,50,100,50,NOTE_FONTSIZE,"SINGLE-WAVE");
+		// 屏幕显示AM值
+		sprintf((char*)temp_str,"MA: %.2f",MA);
+		if (mode) LCD_ShowString(210,80,100,50,NOTE_FONTSIZE,temp_str);
+		// 显示最值
+		max_freq = start_freq + pos1 * delta;
+		sprintf((char*)temp_str,"max at %.2f,%.1fdBm",max_freq,data_polyed_dbm[pos1]);
+		LCD_ShowString(210,120,100,50,NOTE_FONTSIZE,temp_str);
+
+		max_freq = start_freq + pos2 * delta;
+		sprintf((char*)temp_str,"max2 at %.2f,%.1fdBm",max_freq,data_polyed_dbm[pos2]);
+		LCD_ShowString(210,150,100,50,NOTE_FONTSIZE,temp_str);
+
+		max_freq = start_freq + pos3 * delta;
+		sprintf((char*)temp_str,"max3 at %.2f,%.1fdBm",max_freq,data_polyed_dbm[pos3]);
+		LCD_ShowString(210,180,100,50,NOTE_FONTSIZE,temp_str);
+
+		if (mode)
+		{
+			printf("max v1: %f\n",data_polyed_v[pos1]);
+			printf("max v2: %f\n",data_polyed_v[pos1-1]);
+			printf("max v3: %f\n",data_polyed_v[pos1+1]);
+		}
+
+	return;
 }
 /* 频谱模式 */
 void spectrum_handler(u8 mode)
 {
 	uint8_t key_value;
 	uint8_t stage_num = 0;
-	float freq1 = 0;
-	float freq2 = 0;
+
 	while (1)
 	{
 		// 读按键是否有退出
@@ -425,17 +469,17 @@ void spectrum_handler(u8 mode)
 
 		if (stage_num == 1)
 		{
-			freq1 = input_double(80, 100);
+			start_freq = input_double(80, 100);
 			LCD_ShowString(200, 100, 300, 50, STATE_FONTSIZE, "MHz");
-			if (freq1 > 89 && freq1 < 111)
+			if (start_freq > 70 && start_freq < 110)
 			{ // 如果预置频率合法
-				printf("Valid freq1\n");
+				printf("Valid start_freq\n");
 				stage_num = 2;
 			}
-			else if (freq1 != 0)
+			else if (start_freq != 0)
 			{ // 如果预置频率不合法
-				LCD_ShowString(NOT_X, NOT_Y, 300, 50, NOTE_FONTSIZE, "reset freq1 pls");
-				freq1 = 0;
+				LCD_ShowString(NOT_X, NOT_Y, 300, 50, NOTE_FONTSIZE, "reset start_freq pls");
+				start_freq = 0;
 				delay_ms(500);
 				stage_num = 0;
 			}
@@ -443,16 +487,16 @@ void spectrum_handler(u8 mode)
 
 		if (stage_num == 2)
 		{
-			freq2 = input_double(80, 200);
-			LCD_ShowString(200, 200, 300, 50, STATE_FONTSIZE, "MHz");
-			if (freq2 > 89 && freq2 < 111)
+			freq_step = input_int(80, 200);
+			LCD_ShowString(200, 200, 300, 50, STATE_FONTSIZE, "KHz");
+			if (freq_step == 10 || freq_step == 100)
 			{ // 如果预置频率合法
-				printf("Valid freq2\n");
+				printf("Valid freq_step\n");
 				break; // 跳出该while等待开始
 			}
-			else if (freq2 != 0)
+			else if (freq_step != 0)
 			{ // 如果预置频率不合法
-				freq2 = 0;
+				freq_step = 0;
 				delay_ms(500);
 				stage_num = 2;
 			}
@@ -465,8 +509,7 @@ void spectrum_handler(u8 mode)
 		if (key_value == 1)
 		{
 			// KEY0 按下 开始扫频
-			spectrum_drawing(freq1,freq2,mode);
-			
+			spectrum_drawing(mode);
 		}
 		else if (key_value == 4)
 		{
@@ -474,7 +517,7 @@ void spectrum_handler(u8 mode)
 			machine_state = IDLE;
 			LCD_Clear(WHITE);
 			display_main_menu();
-			return;
+			break;
 		}
 	}
 }
@@ -529,12 +572,12 @@ int main(void)
 			{
 				// 频谱测量
 				printf("%d\n",key_val);
-				machine_state = SPECTRUM_WAIT_SELECT;
+				machine_state = SPECTRUM;
 				spectrum_mode = 0;
 			}else if (key_val == 4)
 			{	
 				printf("%d\n",key_val);
-				machine_state = SPECTRUM_WAIT_SELECT;
+				machine_state = SPECTRUM_AM;
 				spectrum_mode = 1;
 			}
 			break;
@@ -545,8 +588,14 @@ int main(void)
 		case CONTINUOUS_OUTPUT:
 			continuous_output_handler();
 			break;
-		case SPECTRUM_WAIT_SELECT:
-			spectrum_handler(spectrum_mode);
+		case SPECTRUM:
+			spectrum_handler(0);
+			LCD_Clear(WHITE);
+			display_main_menu();
+			machine_state = IDLE;
+			break;
+		case SPECTRUM_AM:
+			spectrum_handler(1);
 			break;
 		default:
 			break;

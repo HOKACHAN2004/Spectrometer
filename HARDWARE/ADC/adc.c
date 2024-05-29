@@ -23,7 +23,7 @@ void  Adc_Init(void)
 	
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);//使能GPIOA时钟
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE); //使能ADC1时钟
-
+	ADC_StructInit(&ADC_InitStructure);
 	//初始化ADC的IO口
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3|GPIO_Pin_4;//PA3 PA4  PA3对应ADC123_IN3 PA4对应ADC12_IN4(我们本次实验使用ADC1 通道4)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;//模拟输入
@@ -81,6 +81,7 @@ u16 Get_Adc_Average(u8 ch,u8 times)
 	{
 		temp_val+=Get_Adc(ch);
 		delay_us(20);
+		
 	}
 	return temp_val/times;
 } 

@@ -104,7 +104,7 @@ typedef struct
 #define LBBLUE           0X2B12 //浅棕蓝色(选择条目的反色)
 
 //坐标原点宏定义
-#define ORIGIN_X0 10
+#define ORIGIN_X0 5
 #define ORIGIN_Y0 200
 #define AXIS_X_W 200
 #define AXIS_Y_H 200

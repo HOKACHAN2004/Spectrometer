@@ -457,16 +457,6 @@
               <FilePath>..\HARDWARE\ADF4351\ADF4351.h</FilePath>
             </File>
             <File>
-              <FileName>PE4302.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\PE4302\PE4302.c</FilePath>
-            </File>
-            <File>
-              <FileName>PE4302.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\HARDWARE\PE4302\PE4302.h</FilePath>
-            </File>
-            <File>
               <FileName>FONT.H</FileName>
               <FileType>5</FileType>
               <FilePath>..\HARDWARE\LCD\FONT.H</FilePath>
@@ -515,6 +505,16 @@
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\rng.c</FilePath>
+            </File>
+            <File>
+              <FileName>PE4302.C</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\PE4302\PE4302.C</FilePath>
+            </File>
+            <File>
+              <FileName>PE4302.H</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\HARDWARE\PE4302\PE4302.H</FilePath>
             </File>
           </Files>
         </Group>

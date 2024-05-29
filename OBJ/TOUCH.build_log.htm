@@ -22,7 +22,7 @@ Dialog DLL:      TCM.DLL V1.14.6.0
  
 <h2>Project:</h2>
 E:\STM32_STUDY\PINPUYI\USER\TOUCH.uvprojx
-Project File Date:  05/25/2024
+Project File Date:  05/26/2024
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 1 (build 61)', folder: 'D:\Keil_v5\ARM\ARMCC\Bin'
@@ -30,24 +30,38 @@ Build target 'TOUCH'
 compiling main.c...
 ..\HARDWARE\LCD\lcd.h(137): warning:  #1295-D: Deprecated declaration LCD_ShowMsg - give arg types
   void LCD_ShowMsg();
-control.h(22): warning:  #1-D: last line of file ends without a newline
-  #endif
 rng.h(9): warning:  #1-D: last line of file ends without a newline
    
-main.c(67): warning:  #47-D: incompatible redefinition of macro "STA_X" (declared at line 20 of "control.h")
-  #define STA_X 80
-main.c(121): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	float threshold = data[pos1] * 0.02;
-main.c(215): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+main.c(44): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	float delta = jizhun - 10 - 20 * log10(0.5 * Vpp); // ÒªË¥?õµ?dbÖµ
+main.c(220): warning:  #1035-D: single-precision operand implicitly converted to double-precision
   			unsigned char decay_db = cal_decay_value(0.001 * Vpp);
-main.c(365): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "u8 *"
-  		LCD_ShowString(210,50,100,50,
+main.c(317): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  			unsigned char decay_value = cal_decay_value(0.001*Vpp);
+main.c(379): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "u8 *"
+  		LCD_ShowString(210,30,100,50,
 OTE_FONTSIZE,temp_str);
-main.c: 8 warnings, 0 errors
+main.c(386): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "u8 *"
+  			LCD_ShowString(
+RIGIN_X0+i, 
+RIGIN_Y0+2,100,15,12,temp_str);
+main.c(421): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "u8 *"
+  		if (mode) LCD_ShowString(210,80,100,50,
+OTE_FONTSIZE,temp_str);
+main.c(425): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "u8 *"
+  		LCD_ShowString(210,120,100,50,
+OTE_FONTSIZE,temp_str);
+main.c(429): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "u8 *"
+  		LCD_ShowString(210,150,100,50,
+OTE_FONTSIZE,temp_str);
+main.c(433): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "u8 *"
+  		LCD_ShowString(210,180,100,50,
+OTE_FONTSIZE,temp_str);
+main.c: 11 warnings, 0 errors
 linking...
-Program Size: Code=39760 RO-data=6632 RW-data=148 ZI-data=3876  
+Program Size: Code=44952 RO-data=6768 RW-data=156 ZI-data=4604  
 FromELF: creating hex file...
-"..\OBJ\TOUCH.axf" - 0 Error(s), 7 Warning(s).
+"..\OBJ\TOUCH.axf" - 0 Error(s), 11 Warning(s).
 
 <h2>Collection of Component include folders:</h2>
   E:\STM32_STUDY\PINPUYI\USER\RTE

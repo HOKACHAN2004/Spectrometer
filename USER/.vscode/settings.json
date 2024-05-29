@@ -11,6 +11,10 @@
         "array": "c",
         "stm32f4xx_rng.h": "c",
         "rng.h": "c",
-        "sys.h": "c"
-    }
+        "sys.h": "c",
+        "control.h": "c",
+        "PE4302.H": "cpp",
+        "delay.h": "c"
+    },
+    "editor.fontWeight": "normal"
 }
